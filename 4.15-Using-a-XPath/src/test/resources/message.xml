@@ -1,0 +1,8 @@
+<products>
+	<product>
+		<id>1234</id>
+		<type>Imported Beer</type>
+		<name>Mordor's Pale Lager</name>
+		<price>10.90</price>
+	</product>
+</products>

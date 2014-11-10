@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
+
+	<http:connector name="httpConnector" doc:name="HTTP-HTTPS"/>
+    <jms:activemq-connector name="Active_MQ"  validateConnections="true" doc:name="Active MQ"/>
+	
+	<flow name="brewJmsService" doc:name="brewJmsService">
+          <jms:inbound-endpoint queue="brews.list" connector-ref="Active_MQ"
+                                exchange-pattern="request-response" doc:name="Listen to JMS queue"/>
+           <component class="com.prancingdonkey.service.BrewServiceImpl" doc:name="Get all brews"/>
+        <object-to-string-transformer doc:name="Convert Object to String"/>
+        <logger message="brews: #[payload]" level="INFO" doc:name="Log all brews"/>
+     </flow>
+</mule>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph __version="3.5.0" author="Admin" created="Thu Jul 31 09:39:25 CEST 2014" description="CSV To Map" guiVersion="3.4.4.P" id="1406795095843" licenseCode="Unlicensed" licenseType="Unknown" modified="Thu Jul 31 09:39:25 CEST 2014" modifiedBy="Admin" name="CSV_To_Map" preview-file="${Project_Home}/src/test/resources/products.csv" revision="1.0" showComponentDetails="false">
+<Global>
+<Metadata __referenceCounter="1" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _type="Input" id="ac3e550c-36e6-44af-aa47-d5bb64925983">
+<Record fieldDelimiter="," name="products" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Field containerType="SINGLE" label="Frodo IPA" name="Frodo_IPA" size="10" type="string"/>
+<Field containerType="SINGLE" label="9.4" name="_9_4" size="10" type="string"/>
+<Field containerType="SINGLE" label="5.00" name="_5_00" size="10" type="string"/>
+<Field containerType="SINGLE" eofAsDelimiter="true" label="A new brew" name="A_new_brew" size="10" type="string"/>
+<Field __artificialType="_id" auto_filling="global_row_count" name="__id" type="long"/>
+</Record>
+</Metadata>
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/products" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _type="Output" id="cea865f0-9c58-48a4-a75b-d683a460056c">
+<Record fieldDelimiter="," name="products" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __index="3" __sourcePath="{}/products/A_x0020new_x0020brew" containerType="SINGLE" label="A new brew" name="A_new_brew" type="string"/>
+<Field __index="0" __sourcePath="{}/products/Frodo_x0020IPA" containerType="SINGLE" label="Frodo IPA" name="Frodo_IPA" type="string"/>
+<Field __index="2" __sourcePath="{}/products/_x0035.00" containerType="SINGLE" label="5.00" name="_5_00" type="string"/>
+<Field __index="1" __sourcePath="{}/products/_x0039.4" containerType="SINGLE" label="9.4" name="_9_4" type="string"/>
+</Record>
+</Metadata>
+<Dictionary>
+<Entry id="DictionaryEntry0" input="true" name="inputPayload" output="false" type="object"/>
+<Entry id="DictionaryEntry1" input="false" name="outputPayload" output="true" type="object"/>
+</Dictionary>
+</Global>
+<Phase number="0">
+<Node charset="UTF-8" enabled="enabled" fileURL="dict:inputPayload" guiName="CSV READER" guiX="20" guiY="20" id="DATA_READER0" quoteCharacter="both" quotedStrings="true" skipRows="1" trim="true" type="DATA_READER">
+<attr name="_data_format"><![CDATA[CSV]]></attr>
+<attr name="__dataSourceDefinition"><![CDATA[${Project_Home}/src/test/resources/products.csv]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Foreach 'products' -&gt; 'products'" guiX="460" guiY="20" id="FOREACH_PRODUCTS_PRODUCTS" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
+<attr name="melScript"><![CDATA[//MEL
+//START -> DO NOT REMOVE
+output.__id = num2str(input.__id);
+//END -> DO NOT REMOVE
+output.Frodo_IPA = input.Frodo_IPA;
+output._9_4 = input._9_4;
+output._5_00 = input._5_00;
+output.A_new_brew = input.A_new_brew;
+]]></attr>
+</Node>
+<Node cacheInMemory="true" enabled="enabled" fileURL="dict:outputPayload" guiName="Map&lt;k,v&gt; WRITER" guiX="900" guiY="20" id="MAP_WRITER0" type="MAP_WRITER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<clover:collection clover:name="products" xmlns:clover="http://www.cloveretl.com/ns/xmlmapping">
+  <item clover:inPort="0">
+    <clover:element clover:name="Frodo IPA">$0.Frodo_IPA</clover:element>
+    <clover:element clover:name="9.4">$0._9_4</clover:element>
+    <clover:element clover:name="5.00">$0._5_00</clover:element>
+    <clover:element clover:name="A new brew">$0.A_new_brew</clover:element>
+  </item>
+</clover:collection>]]></attr>
+<attr name="_data_format"><![CDATA[MAP]]></attr>
+</Node>
+<Edge debugMode="true" fromNode="DATA_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="ac3e550c-36e6-44af-aa47-d5bb64925983" outPort="Port 0 (output)" toNode="FOREACH_PRODUCTS_PRODUCTS:0"/>
+<Edge debugMode="true" fromNode="FOREACH_PRODUCTS_PRODUCTS:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="cea865f0-9c58-48a4-a75b-d683a460056c" outPort="Port 0 (out)" toNode="MAP_WRITER0:0"/>
+</Phase>
+</Graph>

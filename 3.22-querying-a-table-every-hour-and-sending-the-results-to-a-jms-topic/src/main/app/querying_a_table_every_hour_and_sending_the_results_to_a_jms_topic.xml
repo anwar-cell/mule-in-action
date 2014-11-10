@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:jdbc-ee="http://www.mulesoft.org/schema/mule/ee/jdbc" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
+      xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/ee/jdbc http://www.mulesoft.org/schema/mule/ee/jdbc/current/mule-jdbc-ee.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd" version="EE-3.5.0">
+    <context:property-placeholder location="common.properties"></context:property-placeholder>
+    <db:generic-config name="Generic_Database_Configuration" url="${jdbc.url}" driverClassName="com.mysql.jdbc.Driver" doc:name="Generic Database Configuration"/>
+    <jms:activemq-connector name="Active_MQ"  validateConnections="true" doc:name="Active MQ"/>
+    <flow name="pollForStuckOrders" doc:name="pollForStuckOrders">
+        <poll doc:name="Poll">
+            <fixed-frequency-scheduler frequency="1" timeUnit="HOURS"/>
+            <db:select config-ref="Generic_Database_Configuration" doc:name="Query orders every hour">
+                <db:dynamic-query><![CDATA[SELECT id FROM orders]]></db:dynamic-query>
+            </db:select>
+        </poll>
+        <foreach doc:name="For Each">
+            <jms:outbound-endpoint queue="orders.status.stuck" connector-ref="Active_MQ" doc:name="Send to JMS queue"></jms:outbound-endpoint>
+        </foreach> 
+<!--         <jdbc-ee:inbound-endpoint pollingFrequency="3600000" queryKey="stuckOrderQuery" connector-ref="jdbcConnector" doc:name="Database"></jdbc-ee:inbound-endpoint> -->
+  
+    </flow>
+</mule>

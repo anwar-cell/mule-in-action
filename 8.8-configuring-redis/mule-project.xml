@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-project xmlns="http://www.mulesoft.com/tooling/project" runtimeId="org.mule.tooling.server.3.5.0.ee" schemaVersion="3.5.0.0">
+    <name>8.8 Configuring an idempotent filter to use Redis as an object store</name>
+    <description></description>
+    <muleExtension name="Redis" qualifier="org.mule.tooling.ui.contribution.redis"/>
+</mule-project>

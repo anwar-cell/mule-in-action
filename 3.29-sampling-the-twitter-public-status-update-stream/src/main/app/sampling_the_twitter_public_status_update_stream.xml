@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:twitter="http://www.mulesoft.org/schema/mule/twitter" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/twitter http://www.mulesoft.org/schema/mule/twitter/current/mule-twitter.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <jms:activemq-connector name="Active_MQ"  validateConnections="true" doc:name="Active MQ"/>
+    <twitter:config name="Twitter" accessKey="${twitter.accessKey}" accessSecret="${twitter.accessSecret}" consumerKey="${twitter.apiKey}" consumerSecret="${twitter.apiSecret}" doc:name="Twitter"/>
+    
+	<flow name="samplePublicStatusUpdates" doc:name="samplePublicStatusUpdates" processingStrategy="synchronous">
+        <poll doc:name="Poll">
+            <fixed-frequency-scheduler frequency="60" timeUnit="SECONDS"/>
+            <twitter:get-user-timeline-by-user-id config-ref="Twitter" userId="${twitter.userid}" doc:name="Query user timeline"/>
+        </poll>
+		
+		<collection-splitter doc:name="Split tweet collection"/>
+        <logger message="tweet: #[payload]" level="INFO" doc:name="Log each tweet"/>
+		<jms:outbound-endpoint  connector-ref="Active_MQ" doc:name="Send a message to JMS queue" queue="tweets"/>
+	</flow>
+
+</mule>

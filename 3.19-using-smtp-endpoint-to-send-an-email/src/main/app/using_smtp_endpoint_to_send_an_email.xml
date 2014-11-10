@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:context="http://www.springframework.org/schema/context" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<context:property-placeholder location="common.properties" />
+	<smtp:gmail-connector name="Gmail" validateConnections="true" doc:name="Gmail"/>
+	<jms:activemq-connector name="Active_MQ"  validateConnections="true" doc:name="Active MQ"/>
+    
+	<flow name="sendExpenseReportEmails" doc:name="sendExpenseReportEmails">
+        <jms:inbound-endpoint topic="expenses.status" connector-ref="Active_MQ" doc:name="Listen to JMS topic"/>
+        <smtp:outbound-endpoint from="${mail.from}"
+                                host="${smtp.host}"
+                                port="${smtp.port}"
+                                user="${smtp.user}" password="${smtp.password}" 
+                                subject="${mail.subject}"
+                                to="${mail.to}" doc:name="Send an email using SMTP" responseTimeout="10000">
+
+        </smtp:outbound-endpoint>
+    </flow>
+</mule>

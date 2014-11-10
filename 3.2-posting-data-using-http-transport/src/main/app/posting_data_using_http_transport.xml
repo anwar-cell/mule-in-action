@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:test="http://www.mulesoft.org/schema/mule/test"
+	xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+	
+	<notifications dynamic="true">
+        <notification event="ENDPOINT-MESSAGE"/>
+    </notifications>
+	
+	<flow name="postExpenseReports" doc:name="postExpenseReports">
+	        <file:inbound-endpoint path="./data/expenses/2/in" doc:name="Poll for files" responseTimeout="10000">
+	            <file:filename-regex-filter pattern=".*xls$"
+	                                        caseSensitive="false"/>
+	        </file:inbound-endpoint>
+	        <http:outbound-endpoint host="localhost"
+	                                port="8080"
+	                                path="expenseReports"
+	                                method="POST" doc:name="Send a request to HTTP endpoint"/>
+	</flow>
+	
+	<flow name="dummyHttpServer" doc:name="dummyHttpServer">
+        <http:inbound-endpoint host="localhost" port="8080" path="expenseReports" doc:name="Recieve HTTP requests"/>
+        <test:component/>
+    </flow>
+</mule>    

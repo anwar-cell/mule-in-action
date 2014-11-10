@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd" version="EE-3.5.0">
+    <jms:activemq-connector name="dataJmsConnector"  validateConnections="true" doc:name="Active MQ"/>
+
+    
+    <flow name="compress-flow" doc:name="compress-flow">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="Recieve HTTP requests"/>
+
+        
+<!--<start id="lis_04_compress"/>-->
+<string-to-byte-array-transformer doc:name="Convert String to Byte Array"/>
+<gzip-compress-transformer />
+<jms:outbound-endpoint 
+    queue="compressedDataQueue" 
+    connector-ref="dataJmsConnector" doc:name="Send a message to JMS queue"/>
+<!--<end id="lis_04_compress"/>-->
+        
+    </flow>
+
+    <flow name="uncompress-flow" doc:name="uncompress-flow">
+
+<!--<start id="lis_04_uncompress"/>-->
+<jms:inbound-endpoint 
+    queue="compressedDataQueue"
+    connector-ref="dataJmsConnector" doc:name="Listen to JMS queue"/>
+<gzip-uncompress-transformer />
+<byte-array-to-string-transformer doc:name="Convert Byte Array to String"/>
+<!--<end id="lis_04_uncompress"/>-->
+        
+        <jms:outbound-endpoint 
+            queue="uncompressedDataQueue" 
+            connector-ref="dataJmsConnector" doc:name="Send to JMS queue"/>
+    </flow>
+
+</mule>

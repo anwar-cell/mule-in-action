@@ -1,0 +1,8 @@
+make a post request to http:/localhost:8080
+
+	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://service.prancingdonkey.com/">
+	    <soapenv:Header/>
+	    <soapenv:Body>
+	        <ser:getBrews/>
+	    </soapenv:Body>
+	</soapenv:Envelope>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd" version="EE-3.5.0">
+
+    <flow name="xpath-expression-flow" doc:name="xpath-expression-flow">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="Recieve HTTP requests"/>
+
+        
+<!--<start id="lis_04_xpath-expression"/>-->
+<set-property propertyName="productId" 
+	value="#[xpath('/products/product[1]/id').text]" doc:name="Set productId Property"/>
+        <set-payload value="#[message.outboundProperties['productId']]" doc:name="Set Payload to productId"/>
+<!--<end id="lis_04_xpath-expression"/>-->
+        
+    </flow>
+    
+    <flow name="xpath-extractor-flow" doc:name="xpath-extractor-flow">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8082" doc:name="Recieve HTTP requests"/>
+
+        
+<!--<start id="lis_04_xpath-extractor"/>-->
+<mulexml:xpath-extractor-transformer 
+    expression="/products/product[1]" 
+    resultType="NODESET" />
+        <object-to-string-transformer doc:name="Convert Object to String"/>
+<!--<end id="lis_04_xpath-extractor"/>-->
+        
+    </flow>
+
+</mule>

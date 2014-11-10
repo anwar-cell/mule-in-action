@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:core="http://www.mulesoft.org/schema/mule/core"
+      xmlns:salesforce="http://www.mulesoft.org/schema/mule/sfdc"
+      version="EE-3.5.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/https">
+    <cxf:configuration initializeStaticBusInstance="false" doc:name="CXF Configuration"
+                       doc:description="Global CXF Configuration"/>
+    <jms:activemq-connector name="Active_MQ"  validateConnections="true" doc:name="Active MQ"/>
+    
+
+    
+    <!--<start id="order_back_lis"/>-->
+
+    <flow name="orderProcessing" doc:name="orderProcessing">
+        <jms:inbound-endpoint queue="order.submit" doc:name="Listen JMS queue" connector-ref="Active_MQ">
+            <jms:transaction action="ALWAYS_BEGIN"/><!--<co id="order_back-1-co"/>-->
+        </jms:inbound-endpoint>
+        <all doc:name="All">
+            <jms:outbound-endpoint queue="erp.order.record" doc:name="Listen JMS queue" connector-ref="Active_MQ">
+                <jms:transaction action="ALWAYS_JOIN"/> <!--<co id="order_back-3-co"/>-->
+            </jms:outbound-endpoint>
+            <jms:outbound-endpoint queue="crm.customer.create" doc:name="Listen JMS queue" connector-ref="Active_MQ">
+                <jms:transaction action="ALWAYS_JOIN"/> <!--<co id="order_back-2-co"/>-->
+            </jms:outbound-endpoint>
+        </all>
+    </flow>
+
+    <flow name="orderCompletion" doc:name="orderCompletion">
+        <jms:inbound-endpoint queue="order.complete" doc:name="Listen JMS queue" connector-ref="Active_MQ">
+            <jms:transaction action="ALWAYS_BEGIN"/>
+        </jms:inbound-endpoint>
+        <collection-aggregator timeout="60000"
+                               failOnTimeout="false" doc:name="Collection Aggregator"/> <!--<co id="order_back-4-co"/>-->
+        <jms:outbound-endpoint queue="events.orders.completed" doc:name="Listen JMS queue" connector-ref="Active_MQ"><!--<co id="order_back-5-co"/>-->
+            <jms:transaction action="ALWAYS_JOIN"/>
+        </jms:outbound-endpoint>
+    </flow>
+    <flow name="externalProcessing" doc:name="externalProcessing">
+        <jms:inbound-endpoint queue="erp.order.record" connector-ref="Active_MQ" doc:name="Listen JMS queue"/>
+        <logger level="INFO" doc:name="Log the order processing"/>
+        <jms:outbound-endpoint queue="order.complete" connector-ref="Active_MQ" doc:name="Listen JMS queue"/>
+    </flow>
+
+    <!--<end id="order_back_lis"/>-->
+
+</mule>

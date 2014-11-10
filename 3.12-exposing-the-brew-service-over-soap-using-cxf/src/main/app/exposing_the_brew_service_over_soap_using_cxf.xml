@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:jersey="http://www.mulesoft.org/schema/mule/jersey"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/jersey http://www.mulesoft.org/schema/mule/jersey/current/mule-jersey.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd" version="EE-3.5.0">
+
+    <flow name="brewSoapService" doc:name="brewSoapService">
+        <http:inbound-endpoint address="http://localhost:8090/soap"
+                               exchange-pattern="request-response" doc:name="Recieve HTTP requests"/> 
+        <cxf:simple-service 
+                serviceClass="com.prancingdonkey.service.BrewService" doc:name="CXF"/>
+        <component class="com.prancingdonkey.service.BrewServiceImpl" doc:name="Provide SOAP Service"/>
+    </flow>
+    
+
+</mule>            

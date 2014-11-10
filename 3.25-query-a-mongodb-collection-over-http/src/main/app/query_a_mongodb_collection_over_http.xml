@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/2.0/mule-mongo.xsd" version="EE-3.5.0">
+    <mongo:config name="Mongo_DB"   database="customers" doc:name="Mongo DB"  >
+        <mongo:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
+    </mongo:config>
+
+
+       <flow name="queryCoolingAlerts" doc:name="queryCoolingAlerts">
+        <http:inbound-endpoint host="localhost"
+                               port="8080"
+                               path="alerts/cooling" 
+                               doc:name="Recieve HTTP requests"/>
+        <byte-array-to-string-transformer doc:name="Convert Byte Array to String"/>
+        <mongo:find-objects config-ref="Mongo_DB"
+                            collection="cooling_alerts" doc:name="Query Mongo collection"/>
+        <mongo:mongo-collection-to-json doc:name="Convert Mongo collection to JSON"/>
+    </flow>
+    
+</mule>

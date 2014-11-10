@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.mule.examples</groupId>
+    <artifactId>examples-catalog</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>2.1-message-attachments</module>
+		<module>2.2-private-flow</module>
+		<module>2.3-simple-composite-message-sources</module>
+		<module>2.4-sub-flow</module>
+		<module>3.12-exposing-the-brew-service-over-soap-using-cxf</module>
+		<module>3.14-publish-report-to-jms-topic</module>
+		<module>3.17-synchronously-invoke-a-component-using-jms</module>
+		<module>3.18-dispatch-cooling-emails-to-a-jms-topic</module>
+		<module>3.19-using-smtp-endpoint-to-send-an-email</module>
+		<module>3.1-using-the-file-transport-to-move-files-from-one-directory-to-another</module>
+		<module>3.20-polling-a-remote-ftp-directory-every-hour-for-new-files</module>
+		<module>3.21-sending-a-file-to-a-remote-ftp-server</module>
+		<module>3.22-querying-a-table-every-hour-and-sending-the-results-to-a-jms-topic</module>
+		<module>3.23-using-a-db-connector-to-insert-rows-into-a-table</module>
+		<module>3.24-save-cooling-alerts-to-a-mongodb-collection</module>
+		<module>3.25-query-a-mongodb-collection-over-http</module>
+		<module>3.26-using-vm-endpoints-to-implement-reliability-patterns</module>
+		<module>3.28-publishing-a-twitter-status-updates-from-a-jms-topic</module>
+		<module>3.29-sampling-the-twitter-public-status-update-stream</module>
+		<module>3.2-posting-data-using-http-transport</module>
+		<module>3.3-using-an-http-inbound-endpoint-to-post-data-to-a-file</module>
+		<module>3.8-exposing-the-brew-listing-over-rest-using-jax-rs</module>
+		<module>4.13-enriching-a-message</module>
+		<module>4.15-Using-a-XPath</module>
+<!-- 		<module>4.16-using-xstream</module> -->
+		<module>4.17-using-xslt</module>
+		<module>4.18-json-requests</module>
+		<module>4.1-encoding-a-payload-in-base64</module>
+		<module>4.3-compressing-a-payload-using-gzip</module>
+		<module>4.4-jaxb</module>
+		<module>5.13-scatter-gather-io</module>
+		<module>5.18-reliability-routing-with-the-until-successful-message-processor</module>
+		<module>5.-filters</module>
+		<module>7.11-proxying-soap-client-requests-with-the-cxf-proxy</module>
+		<module>7.1-using-mule-as-a-service-mediation-layer</module>
+		<module>7.5-back-end-order-processing</module>
+		<module>8.8-configuring-redis</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <eclipsePluginVersion>2.8</eclipsePluginVersion>
+        <jdkName>JavaSE-1.6</jdkName>
+        <jdk.version>1.6</jdk.version>
+        <muleServerId>org.mule.tooling.server.3.5.0.ee</muleServerId>
+        <assembly-descriptor-version>1.0.2</assembly-descriptor-version>
+        <mule.version>3.5.1</mule.version>
+	<sfdc.version>5.4.8</sfdc.version>
+    </properties>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                 <groupId>org.mule.tools</groupId>
+                 <artifactId>maven-mule-plugin</artifactId>
+                 <version>1.9</version>
+                 <extensions>true</extensions>
+             </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2.1</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>project</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+      <profile>
+            <id>studio-release</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.mule.templates</groupId>
+                                <artifactId>templates-tooling-assembly-descriptor</artifactId>
+                                <version>${assembly-descriptor-version}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>${project.artifactId}</finalName>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <descriptorRefs>
+                                        <descriptorRef>maven-no-test-descriptor</descriptorRef>
+                                        <descriptorRef>studio-no-test-descriptor</descriptorRef>
+                                    </descriptorRefs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <!-- Mule Dependencies -->
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Xml configuration -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Mule Transports -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-file</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jdbc</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jms</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Mule Modules -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-cxf</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-management</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-scripting</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-sxc</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- for testing -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${mule.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
+            <version>0.09</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.9</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- provided by mule, needed for build -->
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+            <version>0.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>mulesoft-releases</id>
+            <name>MuleSoft Releases Repository</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>jboss</id>
+            <name>JBoss</name>
+            <url>http://repository.jboss.com/</url>
+        </repository>
+        <repository>
+            <id>oss-sonatype-snapshots</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>codehaus-snaphosts</id>
+            <name>Codehaus Snapshots</name>
+            <url>http://snapshots.repository.codehaus.org/</url>
+        </repository>
+        <repository>
+            <id>codehaus-releases</id>
+            <name>CodeHaus Releases</name>
+            <url>http://repository.codehaus.org/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>mulesoft-releases</id>
+            <name>MuleSoft Releases Repository</name>
+            <url>http://repository.mulesoft.org/releases/</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>mulesoft-snapshots</id>
+            <name>MuleSoft Snapshots Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/snapshots/</url>
+            <layout>default</layout>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <!-- Uncomment when ready to Release -->
+    <!-- <distributionManagement>
+<repository>
+<id>mulesoft-releases</id>
+<name>MuleSoft Repository</name>
+<url>http://repository-master.mulesoft.org/releases/</url>
+</repository>
+<snapshotRepository>
+<id>mulesoft-snapshots</id>
+<name>MuleSoft Snapshot Repository</name>
+<url>http://repository-master.mulesoft.org/snapshots/</url>
+<uniqueVersion>false</uniqueVersion>
+</snapshotRepository>
+</distributionManagement> -->
+
+    <scm>
+        <connection>scm:git:https://github.com/mulesoft/studio-examples-repo.git</connection>
+        <developerConnection>scm:git:https://github.com/mulesoft/studio-examples-repo.git</developerConnection>
+        <url>https://github.com/mulesoft/studio-examples-repo</url>
+        <tag>HEAD</tag>
+    </scm>
+
+</project>
+

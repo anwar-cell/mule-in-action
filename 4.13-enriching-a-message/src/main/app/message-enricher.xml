@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd" version="EE-3.5.0">
+
+    <!--<start id="lis_02_message-enricher-1"/>-->
+    <flow name="invoice-processor" doc:name="invoice-processor">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="Recieve HTTP requests"/>
+
+        <enricher source="#[message.payload.currencyCode]"
+ 			target="#[flowVars['currencyCode']]" doc:name="Message Enricher">
+            <vm:outbound-endpoint path="client.service"
+ 				exchange-pattern="request-response" doc:name="Call fakeClientService"/>
+        </enricher>
+        <component class="com.prancingdonkey.service.InvoiceProcessor" doc:name="Return currencyCode"/>
+    </flow>
+    <!--<end id="lis_02_message-enricher-1"/>-->
+    
+    <flow name="message-enricher-2" doc:name="message-enricher-2">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8082" doc:name="Recieve HTTP requests"/>
+<!--<start id="lis_02_message-enricher-2"/>-->
+        <enricher doc:name="Message Enricher">
+            <vm:outbound-endpoint path="client.service"
+                                  exchange-pattern="request-response" doc:name="Call fakeClientService"/>
+            <enrich source="#[message.payload.currencyCode]"
+                    target="#[flowVars['currencyCode']]" />
+            <enrich source="#[message.payload.promoCode]"
+                    target="#[flowVars['promoCode']]" />
+        </enricher>
+        <!--<end id="lis_02_message-enricher-2"/>-->
+        <response>
+            <expression-transformer doc:name="Return currencyCode and promoCode">
+                <return-argument expression="flowVars['currencyCode']" />
+                <return-argument expression="flowVars['promoCode']" />
+            </expression-transformer>
+        </response>
+    </flow>
+    
+    
+    <flow name="fakeClientService" doc:name="fakeClientService">
+        <vm:inbound-endpoint path="client.service"
+                             exchange-pattern="request-response" doc:name="VM"/>
+        <expression-transformer doc:name="Expression">
+            <return-argument expression="[id:123,name:'John Doe',currencyCode:'USD',promoCode:'ABC123']"
+                             evaluator="groovy"/>
+        </expression-transformer>                            
+    </flow>
+</mule>

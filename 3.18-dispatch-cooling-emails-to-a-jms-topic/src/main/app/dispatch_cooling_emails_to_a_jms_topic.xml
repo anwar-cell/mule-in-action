@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:imaps="http://www.mulesoft.org/schema/mule/imaps"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/imaps http://www.mulesoft.org/schema/mule/imaps/current/mule-imaps.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<smtp:gmail-connector name="Gmail" validateConnections="true" doc:name="Gmail"/>
+    <imaps:connector
+        name="imapsConnector"        
+        checkFrequency="100"     
+        deleteReadMessages="false"
+        doc:name="IMAP"  >
+       
+    </imaps:connector>
+    <jms:activemq-connector name="Active_MQ"  validateConnections="true" doc:name="Active MQ"/>
+    
+	<flow name="dispatchCoolingAlerts" doc:name="dispatchCoolingAlerts">
+        <imaps:inbound-endpoint
+                host="${imap.host}"
+                port="${imap.port}"
+                user="${imap.user}"
+                password="${imap.password}" doc:name="Poll for emails using IMAP" responseTimeout="10000"
+                connector-ref="imapsConnector">
+
+        </imaps:inbound-endpoint>
+        <scatter-gather doc:name="Scatter-Gather">
+            <processor-chain>
+                <logger message="aaaaaaaaaaaaaaa" level="INFO" doc:name="Logger"/>
+                <file:outbound-endpoint path="./data/cooling/reports" doc:name="Store files"/>
+            </processor-chain>
+            <processor-chain>
+                <logger message="bbbbbbbbbbbbb" level="INFO" doc:name="Logger"/>
+                <jms:outbound-endpoint queue="cooling.alerts" connector-ref="Active_MQ" doc:name="Send a message to JMS topic"/>
+            </processor-chain>
+        </scatter-gather>
+    </flow>
+</mule>

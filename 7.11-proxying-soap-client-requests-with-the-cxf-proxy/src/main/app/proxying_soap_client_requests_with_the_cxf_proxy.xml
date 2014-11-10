@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd" version="EE-3.5.0">
+
+
+    <!--<start id="cxf_client_proxy_lis"/>-->
+    <flow name="brewClientProxy" doc:name="brewClientProxy">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8080" doc:name="Recieve HTTP requests"/>
+        <byte-array-to-string-transformer doc:name="Convert Byte Array to String"/>
+        <cxf:proxy-client payload="body"
+                enableMuleSoapHeaders="false" doc:name="Proxy client"/> <!--<co id="cxf_client_proxy-1-co"/>-->
+        <http:outbound-endpoint address="http://localhost:8090/soap"
+                 exchange-pattern="request-response" doc:name="Send a request to HTTP endpoint"/>
+    </flow>
+    <!--<end id="cxf_client_proxy_lis"/>-->
+
+
+    <flow name="brewSoapService" doc:name="brewSoapService">
+        <http:inbound-endpoint address="http://localhost:8090/soap"
+                               exchange-pattern="request-response" doc:name="Recieve HTTP requests"/>
+        <cxf:proxy-service wsdlLocation="./src/main/resources/brew.wsdl" service="BrewService"
+                           namespace="http://service.prancingdonkey.com/" doc:name="Proxy service" payload="body"/>
+        <mulexml:dom-to-xml-transformer doc:name="Convert DOM to XML"/>
+        <test:component>
+            <test:return-data file="./src/main/resources/brew.response.xml"/>
+        </test:component>
+    </flow>
+
+
+</mule>

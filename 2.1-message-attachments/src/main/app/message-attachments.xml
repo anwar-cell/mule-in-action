@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd" version="EE-3.5.0">
+
+
+    <vm:endpoint name="email-orders" path="email.orders.in" exchange-pattern="one-way" doc:name="VM"/>
+    <vm:endpoint name="pdf-orders" path="pdf-order-handler.in" exchange-pattern="one-way" doc:name="VM"/>
+    <flow name="add-attachments" doc:name="add-attachments">
+        <vm:inbound-endpoint path="add-attachments.in" exchange-pattern="request-response" doc:name="VM"/>
+        <script:transformer doc:name="Read file">
+            <script:script engine="groovy">
+                def filePath = message.getInboundProperty('pdfFilePath')
+                def file = new File(filePath)
+                message.addOutboundAttachment(file.name,
+                                              file,
+                                              'application/pdf')
+            </script:script>
+        </script:transformer>
+    </flow>
+
+    <!--<start id="lis_02_eval_attach"/>-->
+    <flow name="email-order-processor" doc:name="email-order-processor">
+        <inbound-endpoint ref="email-orders" doc:name="Generic"/><!--<co id="lis_02_eval_attach_1"/>-->
+        <expression-transformer
+                    expression="#[message.inboundAttachments.values()]" doc:name="Transform to inboundAttachments values"/><!--<co id="lis_02_eval_attach_2"/>-->
+        <collection-splitter doc:name="Collection Splitter"/><!--<co id="lis_02_eval_attach_3"/>-->
+        <outbound-endpoint ref="pdf-orders" doc:name="Generic"/><!--<co id="lis_02_eval_attach_4"/>-->
+    </flow>
+    <!--<end id="lis_02_eval_attach"/>-->
+    
+    <flow name="pdf-order-handler" doc:name="pdf-order-handler">
+        <inbound-endpoint ref="pdf-orders" doc:name="Generic"/>
+        <test:component />
+    </flow>
+</mule>

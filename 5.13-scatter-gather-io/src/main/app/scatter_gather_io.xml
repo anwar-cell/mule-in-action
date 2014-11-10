@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd" version="EE-3.5.0">
+
+ <!--<start id="ch05_aggregateResponses_lis"/>-->
+<flow name="aggregateResponses" doc:name="aggregateResponses">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="Recieve HTTP requests"/>
+        <object-to-byte-array-transformer doc:name="Convert Object to Byte Array"/>
+        <scatter-gather doc:name="Scatter-Gather">
+            <http:outbound-endpoint exchange-pattern="request-response" host="localhost" port="9091" path="shipping" method="POST" doc:name="Send a request to HTTP endpoint"/>
+            <http:outbound-endpoint exchange-pattern="request-response" host="localhost" port="9091" path="tax" method="POST" doc:name="Send a request to HTTP endpoint"/>
+        </scatter-gather>
+        <component class="org.mule.examples.Aggregator" doc:name="Aggregate responses"/>
+        <object-to-string-transformer doc:name="Convert Object to String"/>
+<!--         <collection-splitter doc:name="Collection Splitter"/> -->
+<!--         <object-to-string-transformer doc:name="Object to String"/> -->
+<!--         <set-payload value="#[new java.math.BigDecimal(payload)]" doc:name="Set Payload"/> -->
+<!--         <collection-aggregator failOnTimeout="true" doc:name="Collection Aggregator"/> -->
+<!--         <expression-transformer  -->
+<!--             expression="payload[0] + payload[1]"  -->
+<!--             doc:name="Expression" /> -->
+<!--         <object-to-string-transformer doc:name="Object to String"/><co id="ch05-aggregateResponses-3-cod"/> -->
+
+     </flow> 
+    <flow name="aggregateResponsesFlow2" doc:name="aggregateResponsesFlow2">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="9091" path="tax" doc:name="Recieve HTTP requests"/>
+        <set-payload value="12.55" doc:name="Set Payload to a constant"/>
+    </flow>
+    <flow name="aggregateResponsesFlow1" doc:name="aggregateResponsesFlow1">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="9091" path="shipping" doc:name="Recieve HTTP requests"/>
+        <set-payload doc:name="Set Payload to a constant" value="20.25"/>
+    </flow>
+
+  </mule>

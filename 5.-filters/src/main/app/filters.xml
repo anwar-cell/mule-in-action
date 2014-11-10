@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:imap="http://www.mulesoft.org/schema/mule/imap"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/current/mule-imap.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <jms:activemq-connector name="Active_MQ"  validateConnections="true" doc:name="Active MQ"/>
+    <jms:endpoint topic="dlq" connector-ref="Active_MQ" name="JMS" doc:name="JMS"/>
+
+	<flow name="dispatchCoolingAlerts" doc:name="dispatchCoolingAlerts">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="Recieve HTTP requests"/>
+        <wildcard-filter pattern="*SEVERE*" doc:name="Filter only messages containing SEVERE "/>
+        <jms:outbound-endpoint topic="cooling.alerts" connector-ref="Active_MQ" doc:name="Send to JMS topic"/>
+    </flow>
+    
+    <flow name="validateAndDispatchCoolingAlerts" doc:name="validateAndDispatchCoolingAlerts">
+        <http:inbound-endpoint exchange-pattern="one-way" host="localhost" port="8081" path="orders" doc:name="Recieve HTTP requests"/>
+        <mulexml:schema-validation-filter schemaLocations="orders.xsd" returnResult="false" doc:name="Validate Schema"/>
+        <jms:outbound-endpoint topic="cooling.alerts" connector-ref="Active_MQ" doc:name="Send a message to JMS topic"/>
+    </flow>
+
+	<flow name="idempotentOrderRouter" doc:name="idempotentOrderRouter">
+        <jms:inbound-endpoint topic="orders" connector-ref="Active_MQ" doc:name="Listen to JMS topic" exchange-pattern="request-response"/>
+        <idempotent-message-filter idExpression="xpath('/order/id/text()')" doc:name="Filter duplicate messages"/>
+        <component class="com.prancingdonkey.service.HighPriorityOrderProcessingService" doc:name="Process order" />        
+    </flow>
+    
+</mule>

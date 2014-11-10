@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/2.0/mule-mongo.xsd" version="EE-3.5.0">
+
+    
+    <mongo:config name="mongoDB"
+                  database="customers"
+                  
+                  
+                    doc:name="Mongo DB"  >
+        <mongo:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
+    </mongo:config>   
+    <jms:activemq-connector name="jmsConnector"  validateConnections="true" doc:name="Active MQ"/>
+    <flow name="saveCoolingAlerts" doc:name="saveCoolingAlerts">
+        <jms:inbound-endpoint topic="cooling.alerts"
+                              connector-ref="jmsConnector" doc:name="Listen to JMS topic"/>
+                              
+        <mongo:json-to-dbobject doc:name="JSON to Mongo DBobject"/>   
+        <enricher source="#[payload]" target="#[flowVars['existsCollection']]" doc:name="Message Enricher">
+            <mongo:exists-collection config-ref="mongoDB" collection="cooling_alerts" doc:name="Test if a collection exists"/>
+        </enricher>
+        <choice doc:name="Choice">
+            <when expression="!flowVars['existsCollection']">
+                <mongo:create-collection config-ref="mongoDB" collection="cooling_alerts" doc:name="Create collection"/>
+            </when>
+            <otherwise>
+                <logger message="Customer Collection already exists." level="INFO" doc:name="Log that a collection exists"/>
+            </otherwise>
+        </choice>
+        <mongo:insert-object collection="cooling_alerts"
+                             config-ref="mongoDB" doc:name="Insert into collection"/>		
+    </flow>    
+</mule>
