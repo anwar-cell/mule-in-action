@@ -13,7 +13,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
 
-<jms:activemq-connector name="Active_MQ1"  validateConnections="true" doc:name="Active MQ" />
+<jms:activemq-connector name="Active_MQ1"  validateConnections="true" doc:name="Active MQ" brokerURL="tcp://localhost:61616"/>
         
 <sub-flow name="legacyAdapterSubFlow" doc:name="legacyAdapterSubFlow">
 <mulexml:xml-to-object-transformer doc:name="XML to Object"/>
@@ -21,14 +21,14 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 </sub-flow>
 	<flow name="mainFlow1" doc:name="mainFlow1">
 		<http:inbound-endpoint host="localhost" port="8080"  doc:name="HTTP" exchange-pattern="request-response"/>
-		<flow-ref name="legacyAdapterSubFlow" doc:name="Flow Reference"/>
-		<component class="org.mule.examples.CustomProcessor" doc:name="Java"/>
+		<flow-ref name="legacyAdapterSubFlow" doc:name="call legacyAdapterSubFlow"/>
+		<component class="org.mule.examples.CustomProcessor" doc:name="custom Java component"/>
 	</flow>
 	
 	<flow name="mainFlow2" doc:name="mainFlow2">
 		<jms:inbound-endpoint queue="v1.email" connector-ref="Active_MQ1" doc:name="JMS"/>
-		<flow-ref name="legacyAdapterSubFlow" doc:name="Flow Reference"/>
-		<component class="org.mule.examples.CustomProcessor" doc:name="Java"/>
+		<flow-ref name="legacyAdapterSubFlow" doc:name="call legacyAdapterSubFlow"/>
+		<component class="org.mule.examples.CustomProcessor" doc:name="custom Java component"/>
 	</flow>
 
 </mule>

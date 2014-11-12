@@ -30,7 +30,11 @@ Firstly, run the example using HTTP endpoint.
 The second approach to demonstrate subflow component functionality is to use ActiveMQ messaging system:  
 
 1. Make sure you have a running instance of ActiveMQ. Please consult this [resource](http://activemq.apache.org/getting-started.html) if you need assistance. 
-2. Open [ActiveMQ Admin Console](http://localhost:8161/admin/queues.jsp). Click **Send** tab and fill in the fields as follows:
+2. Open Global Elements tab and set the correct broker URL for the *ActiveMQ1* component. If you have it running with the default setup, the URL should be:
+
+		Broker URL					tcp://localhost:61616		
+
+3. Open [ActiveMQ Admin Console](http://localhost:8161/admin/queues.jsp). Click **Send** tab and fill in the fields as follows:
 
 		Destination					v1.email
 		Queue or Topic				Queue
