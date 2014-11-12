@@ -25,3 +25,6 @@ target/
 mule.test.properties
 *.dat
 *.lic
+.project
+.classpath
+output/

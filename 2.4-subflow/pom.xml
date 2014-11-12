@@ -15,9 +15,15 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.mule.transports</groupId>
+			<artifactId>mule-transport-jms</artifactId>
+			<version>3.5.2</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-all</artifactId>
 			<version>5.10.0</version>
 		</dependency>
 	</dependencies>
+	
 </project>

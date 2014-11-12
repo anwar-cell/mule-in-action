@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+
+<jms:activemq-connector name="Active_MQ1"  validateConnections="true" doc:name="Active MQ" />
+        
+<sub-flow name="legacyAdapterSubFlow" doc:name="legacyAdapterSubFlow">
+<mulexml:xml-to-object-transformer doc:name="XML to Object"/>
+        <logger message="object: #[payload]" level="INFO" doc:name="Logger"/>
+</sub-flow>
+	<flow name="mainFlow1" doc:name="mainFlow1">
+		<http:inbound-endpoint host="localhost" port="8080"  doc:name="HTTP" exchange-pattern="request-response"/>
+		<flow-ref name="legacyAdapterSubFlow" doc:name="Flow Reference"/>
+		<component class="org.mule.examples.CustomProcessor" doc:name="Java"/>
+	</flow>
+	
+	<flow name="mainFlow2" doc:name="mainFlow2">
+		<jms:inbound-endpoint queue="v1.email" connector-ref="Active_MQ1" doc:name="JMS"/>
+		<flow-ref name="legacyAdapterSubFlow" doc:name="Flow Reference"/>
+		<component class="org.mule.examples.CustomProcessor" doc:name="Java"/>
+	</flow>
+
+</mule>
