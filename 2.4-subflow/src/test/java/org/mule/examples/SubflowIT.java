@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-public class SubflowTest extends FunctionalTestCase
+public class SubflowIT extends FunctionalTestCase
 {
 	private String MESSAGE;
 	private String MESSAGE_TEXT = "test";
