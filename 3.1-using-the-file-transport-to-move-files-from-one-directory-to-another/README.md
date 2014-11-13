@@ -20,7 +20,7 @@ Complete the following procedure to create, then run this example in your own in
 
 ### How it works
 
-The message source of this flow is the file inbound endpoint, configured to poll the* /data/expenses/1/in* directory once a minute for new files. The *filename-regexfilter* instructs the endpoint to only accept files that end in .xls and to ignore the case. Finally, the outbound endpoint uses the Mule Expression Language to normalize the filename with the timestamp and the file’s original name. To obtain the latter, you reference the *originalFilename* header populated by the file inbound endpoint. A file inbound endpoint will, by default, remove the file from the source directory it’s read from when it’s passed to an outbound endpoint. You can override this behavior by setting the autoDelete property on the file connector to false. Be careful when doing this, however, as it will cause the file to be repeatedly read by a file inbound endpoint until it’s removed from the source directory.
+The message source of this flow is the file inbound endpoint, configured to poll the* /data/expenses/1/in* directory once a minute for new files. The *filename-regexfilter* instructs the endpoint to only accept files that end in .xls and to ignore the case. Finally, the outbound endpoint uses the Mule Expression Language to normalize the filename with the timestamp and the file’s original name. To obtain the latter, you reference the *originalFilename* header populated by the file inbound endpoint. 
 
 ### Documentation ###
 
