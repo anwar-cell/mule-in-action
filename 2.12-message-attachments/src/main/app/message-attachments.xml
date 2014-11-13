@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd" version="EE-3.5.2">
+    <flow name="email-order-processor" doc:name="email-order-processor">
+        <http:inbound-endpoint exchange-pattern="one-way" host="localhost" port="8081" doc:name="HTTP"/>
+        <set-attachment attachmentName="attachment1" value="Mule Example" contentType="text/plain" doc:name="Add attachment"/>
+        <set-attachment attachmentName="attachment2" value="This example &lt;b&gt;rocks&lt;/b&gt;!" contentType="text/html" doc:name="Attachment"/>
+        <expression-transformer expression="#[message.outboundAttachments.values()]" doc:name="Transform to outboundAttachments values"/>
+        <collection-splitter doc:name="Collection Splitter"/>
+        <test:component />
+    </flow>
+
+</mule>
