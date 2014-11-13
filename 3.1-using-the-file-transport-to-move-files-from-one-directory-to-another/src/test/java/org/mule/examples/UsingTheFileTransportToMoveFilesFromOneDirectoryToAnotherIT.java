@@ -13,7 +13,7 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
-public class UsingTheFileTransportToMoveFilesFromOneDirectoryToAnotherTest extends FunctionalTestCase {
+public class UsingTheFileTransportToMoveFilesFromOneDirectoryToAnotherIT extends FunctionalTestCase {
 
     CountDownLatch copyExpenseReportLatch;
     CountDownLatch callbackLatch;
