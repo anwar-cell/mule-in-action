@@ -19,7 +19,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-public class PrivateFlowTest extends FunctionalTestCase
+public class PrivateFlowIT extends FunctionalTestCase
 {
     private static final String SYNC_PRIVATE_FLOW_NAME = "sync-private-flow";
     private static final String ASYNC_PRIVATE_FLOW_NAME = "async-private-flow";
