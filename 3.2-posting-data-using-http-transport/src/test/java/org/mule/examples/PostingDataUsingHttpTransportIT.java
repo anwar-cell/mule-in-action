@@ -15,7 +15,7 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
-public class PostingDataUsingHttpTransportTest extends FunctionalTestCase {
+public class PostingDataUsingHttpTransportIT extends FunctionalTestCase {
 
     CountDownLatch copyExpenseReportLatch;
     CountDownLatch callbackLatch;
@@ -27,10 +27,7 @@ public class PostingDataUsingHttpTransportTest extends FunctionalTestCase {
             FileUtils.deleteDirectory(dataDirectory);
         }
         dataDirectory.mkdirs();
-        new File("./data/expenses/1/in").mkdirs();
-        new File("./data/expenses/out").mkdirs();
-        new File("./data/expenses/2/in").mkdirs();
-        new File("./data/expenses/status").mkdirs();
+        new File("./data/expenses/in").mkdirs();        
     }
 
     @Override
@@ -73,7 +70,7 @@ public class PostingDataUsingHttpTransportTest extends FunctionalTestCase {
 
         getFunctionalTestComponent("dummyHttpServer").setEventCallback(callback);
 
-        FileUtils.writeStringToFile(new File("./data/expenses/2/in/foo.xls"),"Foo");
+        FileUtils.writeStringToFile(new File("./data/expenses/in/foo.xls"),"Foo");
         assertTrue(latch.await(15000,TimeUnit.SECONDS));
     }
 
