@@ -2,7 +2,7 @@
 
 Reading and writing file data is often the easiest way get data into and out of applications. In this example, you’ll see how to use Mule’s file transport to read, write, move, and delete files.
 
-This example was created thanks to the resources taken from [Mule in action](http://www.manning.com/dossot/) by David Dossot and John D'Emic. 
+This example was created thanks to the resources taken from [Mule in action](http://www.manning.com/dossot/) by David Dossot and John D'Emic.
 
 ### Assumptions ###
 
@@ -20,7 +20,7 @@ Complete the following procedure to create, then run this example in your own in
 
 ### How it works
 
-The message source of this flow is the file inbound endpoint, configured to poll the* /data/expenses/1/in* directory once a minute for new files. The *filename-regexfilter* instructs the endpoint to only accept files that end in .xls and to ignore the case. Finally, the outbound endpoint uses the Mule Expression Language to normalize the filename with the timestamp and the file’s original name. To obtain the latter, you reference the *originalFilename* header populated by the file inbound endpoint. 
+The message source of this flow is the file inbound endpoint, configured to poll the* /data/expenses/1/in* directory every second for new files. The *filename-regexfilter* instructs the endpoint to only accept files that end in .xls and to ignore the case. Finally, the outbound endpoint uses the Mule Expression Language to normalize the filename with the timestamp and the file’s original name. To obtain the latter, you reference the *originalFilename* header populated by the file inbound endpoint. 
 
 ### Documentation ###
 

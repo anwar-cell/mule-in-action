@@ -28,3 +28,4 @@ mule.test.properties
 .project
 .classpath
 output/
+data/
