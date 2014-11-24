@@ -9,8 +9,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.api.MuleEventContext;
-import org.mule.api.context.notification.EndpointMessageNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
@@ -28,27 +26,7 @@ public class PostingDataUsingHttpTransportIT extends FunctionalTestCase {
         }
         dataDirectory.mkdirs();
         new File("./data/expenses/in").mkdirs();        
-    }
-
-    @Override
-    protected void doSetUp() throws Exception {
-        super.doSetUp();
-        copyExpenseReportLatch = new CountDownLatch(1);
-        callbackLatch = new CountDownLatch(1);
-        muleContext.registerListener(new EndpointMessageNotificationListener() {
-            public void onNotification(final ServerNotification notification) {
-                if ("copyExpenseReports".equals(notification.getResourceIdentifier())
-                        && "receive".equals(notification.getActionName())) {
-                    copyExpenseReportLatch.countDown();
-                }
-
-                if ("expenseReportCallback".equals(notification.getResourceIdentifier())
-                        && "end dispatch".equals(notification.getActionName())) {
-                    callbackLatch.countDown();
-                }
-            }
-        });
-    }
+    }    
 
     @Override
     protected String getConfigResources() {
